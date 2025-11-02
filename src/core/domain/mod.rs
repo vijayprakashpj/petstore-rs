@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq)]
 pub enum PetStatus {
     Available,
@@ -16,6 +17,7 @@ pub struct Pet {
     pub tags: Vec<PetTag>,
 }
 
+#[allow(dead_code)]
 impl Pet {
     pub fn is_available(self: &Pet) -> bool {
         self.status == PetStatus::Available
