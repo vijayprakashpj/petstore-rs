@@ -1,7 +1,6 @@
 name: petstore-rs PR workflow
 
 on:
-  push:
   pull_request:
 
 jobs:
