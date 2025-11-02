@@ -1,9 +1,21 @@
+use std::{error::Error, fmt};
+
 #[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq)]
 pub enum PetStatus {
     Available,
-    Unavailable,
+    Pending,
+    Sold,
 }
+
+#[derive(Debug, PartialEq)]
+pub struct PetStatusError(String);
+impl fmt::Display for PetStatusError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+impl Error for PetStatusError {}
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct PetTag(pub String, pub String);
@@ -26,17 +38,38 @@ impl Pet {
     pub fn tag(self: &mut Pet, tag: &PetTag) {
         self.tags.push(tag.to_owned());
     }
+
+    pub fn can_sell(self: &Pet) -> bool {
+        self.status == PetStatus::Available
+    }
+
+    // TODO: To be extended with buyer data
+    pub fn sell(self: &mut Pet) -> Result<(), PetStatusError> {
+        match self.status {
+            PetStatus::Available => {
+                self.status = PetStatus::Sold;
+                Ok(())
+            }
+            PetStatus::Pending => Err(PetStatusError(
+                "Pet sale is being completed by another customer".to_owned(),
+            )),
+            PetStatus::Sold => Err(PetStatusError(
+                "Pet is not available for adoption".to_owned(),
+            )),
+        }
+    }
 }
 
 #[cfg(test)]
 mod test {
     use rstest::rstest;
 
-    use crate::core::domain::{Pet, PetStatus, PetTag};
+    use crate::core::domain::{Pet, PetStatus, PetStatusError, PetTag};
 
     #[rstest]
     #[case(PetStatus::Available, true)]
-    #[case(PetStatus::Unavailable, false)]
+    #[case(PetStatus::Pending, false)]
+    #[case(PetStatus::Sold, false)]
     fn test_pet_availability(#[case] status: PetStatus, #[case] expected: bool) {
         let pet = Pet {
             id: 1,
@@ -78,5 +111,47 @@ mod test {
                 .cloned()
                 .collect::<Vec<PetTag>>()
         );
+    }
+
+    #[rstest]
+    #[case(PetStatus::Available, true)]
+    #[case(PetStatus::Sold, false)]
+    fn test_can_sell(#[case] status: PetStatus, #[case] expected_result: bool) {
+        // GIVEN
+        let pet = Pet {
+            id: 1,
+            name: "Unicorn".to_owned(),
+            status,
+            category: "Imaginary".to_owned(),
+            tags: vec![],
+        };
+
+        // WHEN
+        // THEN
+        assert_eq!(pet.can_sell(), expected_result);
+    }
+
+    #[rstest]
+    #[case(PetStatus::Available, Ok(()))]
+    #[case(PetStatus::Pending, Err(PetStatusError("Pet sale is being completed by another customer".to_owned())))]
+    #[case(PetStatus::Sold, Err(PetStatusError("Pet is not available for adoption".to_owned())))]
+    fn test_pet_sale(
+        #[case] status: PetStatus,
+        #[case] expected_result: Result<(), PetStatusError>,
+    ) {
+        // GIVEN
+        let mut pet = Pet {
+            id: 1,
+            name: "Sher".to_owned(),
+            status,
+            category: "Tiger".to_owned(),
+            tags: vec![PetTag("Family".to_owned(), "Cat".to_owned())],
+        };
+
+        // WHEN
+        let result = pet.sell();
+
+        // THEN
+        assert_eq!(result, expected_result);
     }
 }
