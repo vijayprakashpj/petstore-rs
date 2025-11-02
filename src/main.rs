@@ -1,6 +1,6 @@
 mod core;
 
-use core::domain::{Pet, PetStatus, PetTag};
+use core::domain::pet::{Pet, PetStatus, PetTag};
 
 fn main() {
     let pet = Pet {
