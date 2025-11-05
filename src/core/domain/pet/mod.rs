@@ -60,6 +60,19 @@ impl Pet {
     }
 }
 
+pub struct PetQuery {
+    id: Option<i64>,
+    name: Option<String>,
+    status: Option<PetStatus>,
+    category: Option<String>,
+}
+
+pub trait PetRepository {
+    fn save(pet: Pet) -> Result<Pet, Box<dyn Error>>;
+    fn get_by_id(pet_id: i64) -> Option<Pet>;
+    fn get_by_query(query: PetQuery) -> Vec<Pet>;
+}
+
 #[cfg(test)]
 mod test {
     use rstest::rstest;
