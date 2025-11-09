@@ -7,6 +7,7 @@ pub enum UserStatus {
     Inactive = 0,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq)]
 pub struct User {
     id: i64,
