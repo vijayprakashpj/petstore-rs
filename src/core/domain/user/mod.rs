@@ -20,6 +20,7 @@ pub struct User {
 }
 
 #[derive(Debug, PartialEq)]
+#[allow(dead_code)]
 pub struct UserError(String);
 
 impl fmt::Display for UserError {
