@@ -74,7 +74,7 @@ mod test {
         let pet = Pet {
             id: 1,
             name: String::from("Tommy"),
-            status: status,
+            status,
             category: String::from("Dog"),
             tags: vec![PetTag(String::from("size"), String::from("small"))],
         };
