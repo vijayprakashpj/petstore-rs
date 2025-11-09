@@ -34,14 +34,14 @@ impl User {
     pub fn login(self: &User) -> Result<(), UserError> {
         match self.status {
             UserStatus::Active => Ok(()),
-            UserStatus::Inactive => Err(UserError("User is not active".to_owned())),
+            UserStatus::Inactive => Err(UserError(String::from("User is not active"))),
         }
     }
 
     pub fn logout(self: &User) -> Result<(), UserError> {
         match self.status {
             UserStatus::Active => Ok(()),
-            UserStatus::Inactive => Err(UserError("User is not active".to_owned())),
+            UserStatus::Inactive => Err(UserError(String::from("User is not active"))),
         }
     }
 }
@@ -53,17 +53,17 @@ mod test {
 
     #[rstest]
     #[case(UserStatus::Active, Ok(()))]
-    #[case(UserStatus::Inactive, Err(UserError("User is not active".to_owned())))]
+    #[case(UserStatus::Inactive, Err(UserError("User is not active".to_string())))]
     fn test_login(#[case] status: UserStatus, #[case] expected_result: Result<(), UserError>) {
         // GIVEN
         let user = User {
             id: 100,
-            username: "jdoe".to_owned(),
-            fist_name: "John".to_owned(),
-            last_name: "Doe".to_owned(),
-            email: "john.doe@example".to_owned(),
-            password: "secure-password-42".to_owned(),
-            phone: "012345693".to_owned(),
+            username: String::from("jdoe"),
+            fist_name: String::from("John"),
+            last_name: String::from("Doe"),
+            email: String::from("john.doe@example"),
+            password: String::from("secure-password-42"),
+            phone: String::from("012345693"),
             status: status,
         };
 
@@ -74,17 +74,17 @@ mod test {
 
     #[rstest]
     #[case(UserStatus::Active, Ok(()))]
-    #[case(UserStatus::Inactive, Err(UserError("User is not active".to_owned())))]
+    #[case(UserStatus::Inactive, Err(UserError("User is not active".to_string())))]
     fn test_logout(#[case] status: UserStatus, #[case] expected_result: Result<(), UserError>) {
         // GIVEN
         let user = User {
             id: 100,
-            username: "jdoe".to_owned(),
-            fist_name: "John".to_owned(),
-            last_name: "Doe".to_owned(),
-            email: "john.doe@example".to_owned(),
-            password: "secure-password-42".to_owned(),
-            phone: "012345693".to_owned(),
+            username: String::from("jdoe"),
+            fist_name: String::from("John"),
+            last_name: String::from("Doe"),
+            email: String::from("john.doe@example"),
+            password: String::from("secure-password-42"),
+            phone: String::from("012345693"),
             status: status,
         };
 

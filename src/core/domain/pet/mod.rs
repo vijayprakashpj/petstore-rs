@@ -35,8 +35,8 @@ impl Pet {
         self.status == PetStatus::Available
     }
 
-    pub fn tag(self: &mut Pet, tag: &PetTag) {
-        self.tags.push(tag.to_owned());
+    pub fn tag(self: &mut Pet, tag: PetTag) {
+        self.tags.push(tag);
     }
 
     pub fn can_sell(self: &Pet) -> bool {
@@ -50,12 +50,12 @@ impl Pet {
                 self.status = PetStatus::Sold;
                 Ok(())
             }
-            PetStatus::Pending => Err(PetStatusError(
-                "Pet sale is being completed by another customer".to_owned(),
-            )),
-            PetStatus::Sold => Err(PetStatusError(
-                "Pet is not available for adoption".to_owned(),
-            )),
+            PetStatus::Pending => Err(PetStatusError(String::from(
+                "Pet sale is being completed by another customer",
+            ))),
+            PetStatus::Sold => Err(PetStatusError(String::from(
+                "Pet is not available for adoption",
+            ))),
         }
     }
 }
@@ -73,10 +73,10 @@ mod test {
     fn test_pet_availability(#[case] status: PetStatus, #[case] expected: bool) {
         let pet = Pet {
             id: 1,
-            name: "Tommy".to_owned(),
+            name: String::from("Tommy"),
             status: status,
-            category: "Dog".to_owned(),
-            tags: vec![PetTag("size".to_owned(), "small".to_owned())],
+            category: String::from("Dog"),
+            tags: vec![PetTag(String::from("size"), String::from("small"))],
         };
 
         assert_eq!(pet.is_available(), expected);
@@ -84,33 +84,28 @@ mod test {
 
     #[rstest]
     pub fn test_add_tag(
-        #[values(vec!(), vec!(PetTag("size".to_owned(), "small".to_owned())))] existing_tags: Vec<
+        #[values(vec!(), vec!(PetTag(String::from("size"), String::from("small"))))] existing_tags: Vec<
             PetTag,
         >,
     ) {
         // GIVEN
         let mut pet = Pet {
             id: 1,
-            name: "Tommy".to_owned(),
+            name: String::from("Tommy"),
             status: PetStatus::Available,
-            category: "Dog".to_owned(),
+            category: String::from("Dog"),
             tags: existing_tags.clone(),
         };
         assert_eq!(pet.tags, existing_tags);
-        let new_tag = PetTag("colour".to_owned(), "brown".to_owned());
+        let new_tag = PetTag(String::from("colour"), String::from("brown"));
 
         // WHEN
-        pet.tag(&new_tag);
+        pet.tag(new_tag.clone());
 
         // THEN
-        assert_eq!(
-            pet.tags,
-            existing_tags
-                .iter()
-                .chain(vec![new_tag].iter())
-                .cloned()
-                .collect::<Vec<PetTag>>()
-        );
+        let mut expected_tags = existing_tags;
+        expected_tags.push(new_tag);
+        assert_eq!(pet.tags, expected_tags);
     }
 
     #[rstest]
@@ -120,9 +115,9 @@ mod test {
         // GIVEN
         let pet = Pet {
             id: 1,
-            name: "Unicorn".to_owned(),
+            name: String::from("Unicorn"),
             status,
-            category: "Imaginary".to_owned(),
+            category: String::from("Imaginary"),
             tags: vec![],
         };
 
@@ -133,8 +128,8 @@ mod test {
 
     #[rstest]
     #[case(PetStatus::Available, Ok(()))]
-    #[case(PetStatus::Pending, Err(PetStatusError("Pet sale is being completed by another customer".to_owned())))]
-    #[case(PetStatus::Sold, Err(PetStatusError("Pet is not available for adoption".to_owned())))]
+    #[case(PetStatus::Pending, Err(PetStatusError("Pet sale is being completed by another customer".to_string())))]
+    #[case(PetStatus::Sold, Err(PetStatusError("Pet is not available for adoption".to_string())))]
     fn test_pet_sale(
         #[case] status: PetStatus,
         #[case] expected_result: Result<(), PetStatusError>,
@@ -142,10 +137,10 @@ mod test {
         // GIVEN
         let mut pet = Pet {
             id: 1,
-            name: "Sher".to_owned(),
+            name: String::from("Sher"),
             status,
-            category: "Tiger".to_owned(),
-            tags: vec![PetTag("Family".to_owned(), "Cat".to_owned())],
+            category: String::from("Tiger"),
+            tags: vec![PetTag(String::from("Family"), String::from("Cat"))],
         };
 
         // WHEN
