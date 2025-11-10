@@ -60,6 +60,7 @@ impl Pet {
     }
 }
 
+#[allow(dead_code)]
 pub struct PetQuery {
     id: Option<i64>,
     name: Option<String>,
@@ -67,6 +68,7 @@ pub struct PetQuery {
     category: Option<String>,
 }
 
+#[allow(dead_code)]
 pub trait PetRepository {
     fn save(pet: Pet) -> Result<Pet, Box<dyn Error>>;
     fn get_by_id(pet_id: i64) -> Option<Pet>;
